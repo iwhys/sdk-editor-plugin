@@ -1,8 +1,121 @@
-apply plugin: 'java-library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+apply from: '../buildSrc/build.gradle'
 
-dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+sourceSets {
+    main {
+        kotlin {
+            srcDirs += '../buildSrc/src/main/java'
+        }
+        resources {
+            srcDirs += '../buildSrc/src/main/resources'
+        }
+    }
 }
 
-sourceCompatibility = "7"
-targetCompatibility = "7"
+// 项目主页
+def siteUrl = 'https://github.com/iwhys/class-editor-plugin'
+// 项目的git地址
+def gitUrl = 'https://github.com/iwhys/class-editor-plugin.git'
+// 发布到JCenter上的项目名字
+def libName = "sdk-editor-plugin"
+// 仓库名
+def repoName = 'sdk-editor'
+// 项目描述
+def projectDescription = "The plugin to edit sdk."
+
+group = "com.iwhys.sdkeditor"
+// 版本号，下次更新是只需要更改版本号即可
+version = "1.0.0"
+
+//生成源文件
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+//文档打包成jar
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+//拷贝javadoc文件
+task copyDoc(type: Copy) {
+    from "${buildDir}/docs/"
+    into "docs"
+}
+
+//上传到JCenter所需要的源码文件
+artifacts {
+//    archives javadocJar
+//    archives sourcesJar
+}
+
+// 配置maven库，生成POM.xml文件
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'jar'
+                //项目描述
+                name projectDescription
+                url siteUrl
+                licenses {
+                    license {
+                        //开源协议
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        //开发者的个人信息
+                        id 'iwhys'
+                        name 'iwhys'
+                        email 'whs008@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+//上传到JCenter
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+bintray {
+    user = properties.getProperty("bintray.user")    //读取 local.properties 文件里面的 bintray.user
+    key = properties.getProperty("bintray.apikey")   //读取 local.properties 文件里面的 bintray.apikey
+    configurations = ['archives']
+    pkg {
+        //注意：这里的repo值必须要和创建Maven仓库的时候的名字一样
+        repo = repoName
+        //发布到JCenter上的项目名字
+        name = libName
+        //项目描述
+        desc = projectDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
+}
+
+javadoc {
+    options{
+        //项目里面有中文注释的话，必须将格式设置为UTF-8，不然会出现乱码
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
+}
