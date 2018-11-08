@@ -19,7 +19,7 @@ repositories {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation('com.android.tools.build:gradle:3.2.1') {
+    implementation('com.android.tools.build:gradle:3.0.0') {
         exclude group: 'org.jetbrains.kotlin'
     }
     implementation gradleApi()

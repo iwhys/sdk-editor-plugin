@@ -41,9 +41,9 @@ class SdkEditorPlugin : Transform(), Plugin<Project> {
 
     override fun transform(transformInvocation: TransformInvocation) {
         val start = System.currentTimeMillis()
-        log("开始执行transform操作")
+        log("begin to transform")
         TransformHandler(project, transformInvocation).handle()
-        log("执行transform操作,用时:${(System.currentTimeMillis() - start) / 1000}秒")
+        log("finish transform, total time:${(System.currentTimeMillis() - start) / 1000} seconds")
     }
 
     companion object {

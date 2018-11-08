@@ -66,17 +66,17 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 根据收集到的信息修复sdk中的bug类
      */
     private fun fixSdk() {
-        log("开始修复sdk中的bug类")
+        log("begin to fix the bug classes.")
         for (jarInput in jarInputs.values) {
             if (!isTargetJar(jarInput.name)) {
-                log("非目标Jar包,直接输出:${jarInput.name}")
+                log("not the target jar package, output directly:${jarInput.name}")
                 safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
                 continue
             }
-            log("发现目标Jar包：${jarInput.name},准备执行修复操作")
+            log("find the target jar package：${jarInput.name}, prepare to fix.")
             jarInput.handleClass { name !in replaceClasses }
         }
-        log("完成修复sdk中的bug类")
+        log("all bug classes have been fixed.")
     }
 
     /**
@@ -104,13 +104,13 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 收集信息之后的dirInputs或者jarInputs会被直接输入，因为他们实际上应该都是开发者可控源文件的编译产物
      */
     private fun gatherInfo() {
-        log("开始收集需要处理的类信息")
+        log("begin to gather the classes information.")
         dirInputs.forEach(infoFromDirInput)
         val jarInputNames = jarInputs.keys
         sdkEditorConfig.extraJarNames?.mapNotNull {
             findInfoJarInput(it, jarInputNames)
         }?.forEach(infoFromJarInput)
-        log("收集信息结束:$replaceClasses")
+        log("the classes information collection:$replaceClasses")
     }
 
     /**
@@ -141,7 +141,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                     }
                 }
             } else {
-                log("非Class文件,直接输出:${it.name}")
+                log("the file's extension is not class, output directly:${it.name}")
                 it.copyToDir(dest)
             }
         }
@@ -151,7 +151,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 从jar文件中收集信息
      */
     private val infoFromJarInput: (JarInput) -> Unit = { jarInput ->
-        log("从jar包(${jarInput.name})中收集信息")
+        log("gather classes information from jar:${jarInput.name}")
         jarInput.handleClass {
             gatherInfo()
             true
@@ -176,19 +176,19 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                         if (needOutput) {
                             writeFile(jarFileTmpDir)
                         } else {
-                            log("替换bug类:$name")
+                            log("replace the bug class:$name")
                         }
                         detach()
                     }
                 }
             } else {
-                log("输出目标Jar包中的非Class文件:${it.name}")
+                log("output the file not end with 'class' in the target jar package:${it.name}")
                 val outFile = File(jarFileTmpDir, it.name)
                 FileUtils.write(outFile, inputStream.reader().readText())
             }
         }
         val tmpDirFile = File(jarFileTmpDir)
-        log("重新打包目标Jar包,并输出:$dest")
+        log("repackage and output the target jar package:$dest")
         JarUtil.jarFile(tmpDirFile, dest)
         safe {
             FileUtils.deleteDirectory(tmpDirFile)
@@ -202,7 +202,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         if (hasAnnotation(ReplaceClass::class.java)) {
             val jarName = (getAnnotation(ReplaceClass::class.java) as ReplaceClass).value
             if (jarName.isEmpty()) {
-                log("注意:Fix类${name}的注解中未添加所属的Jar包名称!")
+                log("Note:the annotation in the Fix class is missing the value of the jar package name:$name")
             }
             handleReplaceClass(jarName)
         }
@@ -218,7 +218,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         }
         targetJarNames += jarName
         replaceClasses += name
-        log("发现Fix类:$name 所属jar包名称:$jarName")
+        log("find the Fix class named:$name the jar package name:$jarName")
     }
 
 }
