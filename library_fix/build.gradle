@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 28
+
+
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+repositories {
+    flatDir {
+        dir('libs')
+    }
+}
+
+task makeJar(type: Copy) {
+    delete 'build/libs/mylibrary.jar' //删除已经存在的jar包
+    from('build/intermediates/bundles/release/')//从该目录下加载要打包的文件
+    into('build/libs/')//jar包的保存目录
+    include('classes.jar')//设置过滤，只打包classes文件
+    rename('classes.jar', 'mylibrary.jar')//重命名，mylibrary.jar 根据自己的需求设置
+}
+makeJar.dependsOn(build)
+
+android {
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    fileTree(include: ['*.jar', '*.aar'], dir: 'libs').each {
+        def name = it.name
+        def index = name.lastIndexOf(".")
+        def fileName = name[0..<index]
+        def extName = name[(index + 1)..<name.length()]
+        implementation(name: fileName, ext: extName, changing: true)
+    }
+
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation('com.google.android.gms:play-services-ads:15.0.0') {
+        exclude group: 'com.android.support'
+    }
+    implementation('com.facebook.android:audience-network-sdk:4.23.0') {
+        exclude group: 'com.android.support'
+    }
+    implementation 'com.iwhys.classeditor:domain:1.1.0'
+}

@@ -1,0 +1,28 @@
+apply plugin: 'kotlin'
+
+buildscript {
+    ext.kotlin_version = '1.3.0'
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation('com.android.tools.build:gradle:3.2.1') {
+        exclude group: 'org.jetbrains.kotlin'
+    }
+    implementation gradleApi()
+    implementation 'org.javassist:javassist:3.24.0-GA'
+    implementation "com.iwhys.classeditor:domain:1.1.0"
+}
