@@ -2,9 +2,11 @@
 // Source code recreated from a .class file by IntelliJ IDEA
 // (powered by Fernflower decompiler)
 //
+@file:JvmName("a")
 
 package com.duapps.ad.a
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.*
 import android.os.Handler.Callback
@@ -19,7 +21,7 @@ import com.duapps.ad.internal.utils.e as ea
 import com.duapps.ad.stats.g as gg
 
 
-
+@SuppressLint("MissingPermission")
 @ReplaceClass("DuappsAd-HW-v1.1.1.6-release")
 class a(var1: Context, var2: Int, var3: Long, private val o: Int, private val r: String) : com.duapps.ad.entity.strategy.a<NativeAd>(var1, var2, var3), Callback {
     private val b = Collections.synchronizedList(LinkedList<AmUnifiedAd>())

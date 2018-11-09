@@ -1,10 +1,13 @@
 ## 简介
 sdk-editor是为了实现对APP引用的第三方SDK进行修改而开发的Gradle插件，插件利用Android Plugin提供的Transform API来干预Build流程，实现对三方SDK中特定类的替换修改，不影响APP运行性能，也不会增加生成的APK体积。
 ## 适用场景
-#### 1. 修复SDK中存在的Bug；
-#### 2. 暴露出SDK某些未提供的接口；
-#### 3. 扩展SDK功能；
-#### 4. 其他需要修改SDK已有类的需求；
+1）修复SDK中存在的Bug；
+
+2）暴露出SDK某些未提供的接口；
+
+3）扩展SDK功能；
+
+4）其他需要修改SDK已有类的需求；
 ## 用法
 #### 1. 在根项目的build.gradle文件中添加插件依赖：
 ```gradle
@@ -42,7 +45,7 @@ public class DuNativeAd {
 
 1）在任意项目中新建一个module（如demo中的library_fix）；
 
-2）添加对需要修复的SDK的依赖，并把修复代码复制到该module的源码目录；
+2）添加对需要修复的SDK（如：DuappsAd-HW-v1.1.1.6-release.aar）以及插件注解包（com.iwhys.classeditor:domain:1.1.0）的依赖，并把修复代码复制到该module的源码目录；
 
 3）在终端(Terminal)中执行命令：gradlew library_fix:build，即可在该module的build/output目录中看到生成的aar文件；
 
@@ -56,5 +59,12 @@ sdkEditor {
 }
 ```
 ## 常见问题
+#### 1. 新建与Bug类同包名的Fix类时，编译器提示"Package 'xxx.xxx.xxx' clashes with class of same name"
+这种情况是因为包路径中的包和类重名了，我们可以通过把java类转换为kotlin类来修复这个问题。
 
+注意：此时需要添加kotlin相关的支持，且因为kotlin编译器在把类编译为class的时候，默认会把文件名改为：原文件名+kt，因此在kotlin版的Fix类中添加文件命名注解 @file:JvmName("Bug类的名称")
+#### 2. 在新建的Fix类中，存在部分形如"a.b.c"的类无法正确的导入，或者导入之后与当前类的成员重名
+这种情况我们可以把类改为kotlin版，并利用kotlin提供的 import xxx as yyy功能，对导入的有问题的类进行重命名。
+#### 3. 新建的Fix类时，如果其所在包的名字同级已经存在一个同名的类（如已存在类com.a.a，Fix类路径com.a.a.Fix,则IDE提示"Redeclare a")
+我们可以通过"高级用法"的笨办法，新建module把已存在类com.a.a和Fix类com.a.a.Fix分别放在不同的module来实现。
 ## 原理分析
