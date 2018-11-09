@@ -67,7 +67,9 @@ sdkEditor {
 这种情况我们可以把类改为kotlin版，并利用kotlin提供的 import xxx as yyy功能，对导入的有问题的类进行重命名。个人感觉通过导入重命名方式能够解决99%的这种问题，剩下的1%可以通过反射来实现。
 #### 3. 新建的Fix类时，如果其所在包的名字同级已经存在一个同名的类（如已存在类com.a.a，Fix类路径com.a.a.Fix,则IDE提示"Redeclare a")
 我们可以通过"高级用法"的笨办法，新建module把已存在类com.a.a和Fix类com.a.a.Fix分别放在不同的module来实现。
-## 插件项目结构
+#### 4. Fix过程正常，但是APK运行到Fix类发生Crash，提示Fix类中缺少xxx方法
+通常我们会使用IDE来浏览依赖的SDK文件，并在IDE中把Bug类的源码拷贝到Fix类中，但有些情况下IDE反编译的class代码并不完整，建议使用jeb反编译SDK中的Bug类。
+## 插件项目说明
 #### module：buildSrc
 Gradle项目中上帝视角的module，不需要在settings.gradle中注册，编译过程中最先被编译，可以为其他module提供通用的工具类。
 项目中使用buildSrc来实现插件核心功能，可以在不发布插件的情况下对插件代码进行实时调试。
@@ -78,3 +80,8 @@ library_fix是"高级用法"的示例，用来实现fix类的多项目重用。
 #### module：plugin
 plugin是为最终发布插件而准备的，该module引用了buildSrc的所有资源，并配置了发布插件到jcenter的相关信息。
 ## 原理分析
+[sdk-editor原理分析](sdk-editor原理分析.md)
+## 特别感谢
+[javassist](https://github.com/jboss-javassist/javassist) [官方网站](http://www.javassist.org)
+## 协议
+[The Apache Software License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.txt)
