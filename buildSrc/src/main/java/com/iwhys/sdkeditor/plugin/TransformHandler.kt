@@ -73,7 +73,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                 safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
                 continue
             }
-            log("find the target jar package：${jarInput.name}, prepare to fix.")
+            log("found the target jar package：${jarInput.name}, prepare to fix.")
             jarInput.handleClass { name !in replaceClasses }
         }
         log("all bug classes have been fixed.")
@@ -151,7 +151,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 从jar文件中收集信息
      */
     private val infoFromJarInput: (JarInput) -> Unit = { jarInput ->
-        log("gather classes information from jar:${jarInput.name}")
+        log("gathering classes information from jar:${jarInput.name}")
         jarInput.handleClass {
             gatherInfo()
             true
@@ -176,7 +176,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                         if (needOutput) {
                             writeFile(jarFileTmpDir)
                         } else {
-                            log("replace the bug class:$name")
+                            log("replaced the bug class:$name")
                         }
                         detach()
                     }
@@ -218,7 +218,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         }
         targetJarNames += jarName
         replaceClasses += name
-        log("find the Fix class named:$name the jar package name:$jarName")
+        log("found the Fix class named:$name the jar package name:$jarName")
     }
 
 }

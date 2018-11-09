@@ -14,9 +14,9 @@ sourceSets {
 }
 
 // 项目主页
-def siteUrl = 'https://github.com/iwhys/class-editor-plugin'
+def siteUrl = 'https://github.com/iwhys/sdk-editor-plugin'
 // 项目的git地址
-def gitUrl = 'https://github.com/iwhys/class-editor-plugin.git'
+def gitUrl = 'https://github.com/iwhys/sdk-editor-plugin.git'
 // 发布到JCenter上的项目名字
 def libName = "sdk-editor-plugin"
 // 仓库名
@@ -48,8 +48,8 @@ task copyDoc(type: Copy) {
 
 //上传到JCenter所需要的源码文件
 artifacts {
-//    archives javadocJar
-//    archives sourcesJar
+    archives javadocJar
+    archives sourcesJar
 }
 
 // 配置maven库，生成POM.xml文件
