@@ -107,7 +107,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         log("begin to gather the classes information.")
         dirInputs.forEach(infoFromDirInput)
         val jarInputNames = jarInputs.keys
-        sdkEditorConfig.extraJarNames?.mapNotNull {
+        sdkEditorConfig.fixedJarNames?.mapNotNull {
             findInfoJarInput(it, jarInputNames)
         }?.forEach(infoFromJarInput)
         log("the classes information collection:$replaceClasses")
