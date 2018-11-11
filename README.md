@@ -25,7 +25,7 @@ apply plugin: 'sdk-editor'
 
 下面以demo模块中libs引用的三方SDK DuappsAd-HW-v1.1.1.6-release.aar为例，我们需要修改SDK中的com.duapps.ad.DuNativeAd类，在其中添加广告请求监听器，修改流程如下：
 
-1）在demo工程的main/java下新建包com/duapps/ad；
+1）在demo工程的main/java下新建包com/duapps/ad（如果怕污染原项目代码，也可以在main文件夹新建单独目录，并在build.gradle的SourceSet中配置为src目录）；
 
 2）在1)新建的包com/duapps/ad中新建DuNativeAd类，并拷贝原SDK中DuNativeAd类的内容；
 
