@@ -70,14 +70,14 @@ sdkEditor {
 #### 4. Fix过程正常，但是APK运行到Fix类发生Crash，提示Fix类中缺少xxx方法
 通常我们会使用IDE来浏览依赖的SDK文件，并在IDE中把Bug类的源码拷贝到Fix类中，但有些情况下IDE反编译的class代码并不完整，建议使用jeb反编译SDK中的Bug类。
 ## 插件项目说明
-#### module：buildSrc
+#### 1. module：buildSrc
 Gradle项目中上帝视角的module，不需要在settings.gradle中注册，编译过程中最先被编译，可以为其他module提供通用的工具类。
 项目中使用buildSrc来实现插件核心功能，可以在不发布插件的情况下对插件代码进行实时调试。
-#### module：demo
+#### 2. module：demo
 demo是SdkEditor插件的使用者（即常规的app module），在其build.gradle文件中直接引用了插件入口实现类SdkEditorPlugin，并配置了"高级用法"中使用的"extraJarNames"参数，可以直接在终端(Terminal)中执行：gradlew demo:assembleDebug来体验插件工作的流程。
-#### module：library_fix
+#### 3. module：library_fix
 library_fix是"高级用法"的示例，用来实现fix类的多项目重用。
-#### module：plugin
+#### 4. module：plugin
 plugin是为最终发布插件而准备的，该module引用了buildSrc的所有资源，并配置了发布插件到jcenter的相关信息。
 ## 原理简析
 #### 1. 利用原SDK的环境编译Fix类
