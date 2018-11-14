@@ -25,7 +25,7 @@ apply plugin: 'sdk-editor'
 
 下面以demo module中替换support v4包中的BuildCompat类为例进行说明，我们需要BuildCompat类中的isAtLeastQ方法，在其中添加一条Toast语句，修改流程如下：
 
-1）在demo工程的main/java下新建android/support/v4/os/BuildCompat类（）；
+1）在demo工程的main/java下新建android/support/v4/os/BuildCompat类；
 
 2）拷贝原SDK中BuildCompat类的内容，并修改新建的BuildCompat类；
 ```java
