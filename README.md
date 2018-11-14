@@ -13,7 +13,7 @@ sdk-editor是为实现修改APP依赖的第三方SDK而开发的Gradle插件，�
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.iwhys.sdkeditor:plugin:1.1.0'
+        classpath 'com.iwhys.sdkeditor:plugin:1.1.2'
     }
 }
 ```
