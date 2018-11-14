@@ -41,6 +41,9 @@ public class DuNativeAd {
     public static final String EXTRAS_AD_AID = "ad_inct_id";
     private boolean h;
     private DuAdDataCallBack i;
+    /***************
+     * 新增加的静态变量
+     ****************/
     private static DuAdGlobalListener duAdGlobalListener;
     private boolean isBound = false;
 
@@ -65,6 +68,9 @@ public class DuNativeAd {
                     DuNativeAd.this.c.setProcessClickUrlCallback(DuNativeAd.this.g);
                 }
 
+                /***************
+                 * 新增逻辑处理，用来暴露新的接口
+                 ****************/
                 if (duAdGlobalListener != null) {
                     int type = var1.getAdChannelType();
                     if (type == NativeAd.CHANNEL_TYPE_AM_CONTENT
@@ -82,6 +88,9 @@ public class DuNativeAd {
             }
 
             public void onAdError(AdError var1) {
+                /***************
+                 * 新增逻辑处理，用来暴露新的接口
+                 ****************/
                 if (duAdGlobalListener != null) {
                     duAdGlobalListener.onAdError(DuNativeAd.this.e, var1);
                 }
@@ -96,6 +105,9 @@ public class DuNativeAd {
                 if (var1 != null) {
                     var1.onClick(DuNativeAd.this);
                 }
+                /***************
+                 * 新增逻辑处理，用来暴露新的接口
+                 ****************/
                 reportAdClick();
             }
         };
@@ -116,6 +128,9 @@ public class DuNativeAd {
         return isBound;
     }
 
+    /***************
+     * 新增逻辑处理，用来暴露新的接口
+     ****************/
     public static void registerGlobalListener(DuAdGlobalListener globalListener) {
         duAdGlobalListener = globalListener;
     }
@@ -214,6 +229,9 @@ public class DuNativeAd {
 
     }
 
+    /***************
+     * 新增逻辑处理
+     ****************/
     private void reportAdClick(){
         if (duAdGlobalListener == null) return;
         int type = getAdChannelType();
@@ -232,6 +250,9 @@ public class DuNativeAd {
         }
     }
 
+    /***************
+     * 新增逻辑处理
+     ****************/
     private boolean reportAdShow(View var1){
         if (duAdGlobalListener == null) return false;
         int type = getAdChannelType();

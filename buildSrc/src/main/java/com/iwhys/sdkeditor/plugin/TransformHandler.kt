@@ -66,17 +66,17 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 根据收集到的信息修复sdk中的bug类
      */
     private fun fixSdk() {
-        log("begin to fix the bug classes.")
+        log("Begin to fix the bug classes.")
         for (jarInput in jarInputs.values) {
             if (!isTargetJar(jarInput.name)) {
-                log("not the target jar package, output directly:${jarInput.name}")
+                log("Not the target jar package, output directly:${jarInput.name}")
                 safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
                 continue
             }
-            log("found the target jar package：${jarInput.name}, prepare to fix.")
+            log("Found the target jar package：${jarInput.name}, prepare to fix.")
             jarInput.handleClass { name !in replaceClasses }
         }
-        log("all bug classes have been fixed.")
+        log("All bug classes have been fixed.")
     }
 
     /**
@@ -104,13 +104,13 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 收集信息之后的dirInputs或者jarInputs会被直接输入，因为他们实际上应该都是开发者可控源文件的编译产物
      */
     private fun gatherInfo() {
-        log("begin to gather the classes information.")
+        log("Begin to gather the classes information.")
         dirInputs.forEach(infoFromDirInput)
         val jarInputNames = jarInputs.keys
-        sdkEditorConfig.fixedJarNames?.mapNotNull {
+        sdkEditorConfig.fixedJarNamesSet()?.mapNotNull {
             findInfoJarInput(it, jarInputNames)
         }?.forEach(infoFromJarInput)
-        log("the classes information collection:$replaceClasses")
+        log("The classes information collection:$replaceClasses")
     }
 
     /**
@@ -141,7 +141,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                     }
                 }
             } else {
-                log("the file's extension is not class, output directly:${it.name}")
+                log("The file's extension is not class, output directly:${it.name}")
                 it.copyToDir(dest)
             }
         }
@@ -151,7 +151,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 从jar文件中收集信息
      */
     private val infoFromJarInput: (JarInput) -> Unit = { jarInput ->
-        log("gathering classes information from jar:${jarInput.name}")
+        log("Gathering classes information from jar:${jarInput.name}")
         jarInput.handleClass {
             gatherInfo()
             true
@@ -176,19 +176,19 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                         if (needOutput) {
                             writeFile(jarFileTmpDir)
                         } else {
-                            log("replaced the bug class:$name")
+                            log("Replaced the bug class:$name")
                         }
                         detach()
                     }
                 }
             } else {
-                log("output the file not end with 'class' in the target jar package:${it.name}")
+                log("Output the file not end with 'class' in the target jar package:${it.name}")
                 val outFile = File(jarFileTmpDir, it.name)
                 FileUtils.write(outFile, inputStream.reader().readText())
             }
         }
         val tmpDirFile = File(jarFileTmpDir)
-        log("repackage and output the target jar package:$dest")
+        log("Repackage and output the target jar package:$dest")
         JarUtil.jarFile(tmpDirFile, dest)
         safe {
             FileUtils.deleteDirectory(tmpDirFile)
@@ -218,7 +218,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         }
         targetJarNames += jarName
         replaceClasses += name
-        log("found the Fix class named:$name the jar package name:$jarName")
+        log("Found the Fix class named:$name the jar package name:$jarName")
     }
 
 }
