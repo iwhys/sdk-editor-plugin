@@ -25,7 +25,7 @@ android {
 }
 
 sdkEditor {
-    fixedJarNames = ['hack_du']
+    extraJarNames = ['hack_du']
 }
 
 repositories {
