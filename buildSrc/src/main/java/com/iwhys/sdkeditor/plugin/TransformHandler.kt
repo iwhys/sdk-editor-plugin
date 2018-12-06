@@ -7,6 +7,8 @@ import com.android.build.api.transform.TransformInvocation
 import com.iwhys.classeditor.domain.ReplaceClass
 import javassist.ClassPool
 import javassist.CtClass
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import java.io.File
@@ -26,6 +28,8 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
     }
 
     private val sdkEditorConfig = SdkEditorConfig[project]
+
+    private val isParallel = sdkEditorConfig.parallel
 
     private val outputProvider = transformInvocation.outputProvider
 
@@ -66,7 +70,16 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 根据收集到的信息修复sdk中的bug类
      */
     private fun fixSdk() {
-        log("Begin to fix the bug classes.")
+        if (isParallel) {
+            fixSdkParallel()
+        } else {
+            fixSdkSerial()
+        }
+        log("All bug classes have been fixed.")
+    }
+
+    private fun fixSdkSerial() {
+        log("Begin to fix the bug classes in serial.")
         for (jarInput in jarInputs.values) {
             if (!isTargetJar(jarInput.name)) {
                 log("Not the target jar package, output directly:${jarInput.name}")
@@ -76,7 +89,23 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
             log("Found the target jar package：${jarInput.name}, prepare to fix.")
             jarInput.handleClass { name !in replaceClasses }
         }
-        log("All bug classes have been fixed.")
+    }
+
+    private fun fixSdkParallel() = runBlocking {
+        log("Begin to fix the bug classes in parallel.")
+        for (jarInput in jarInputs.values) {
+            if (!isTargetJar(jarInput.name)) {
+                log("Not the target jar package, output directly:${jarInput.name}")
+                launch {
+                    safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
+                }
+                continue
+            }
+            log("Found the target jar package：${jarInput.name}, prepare to fix.")
+            launch {
+                jarInput.handleClass { name !in replaceClasses }
+            }
+        }
     }
 
     /**
@@ -104,13 +133,36 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 收集信息之后的dirInputs或者jarInputs会被直接输入，因为他们实际上应该都是开发者可控源文件的编译产物
      */
     private fun gatherInfo() {
-        log("Begin to gather the classes information.")
+        if (isParallel) {
+            gatherInfoParallel()
+        } else {
+            gatherInfoSerial()
+        }
+        log("The classes information collection:$replaceClasses")
+    }
+
+    private fun gatherInfoSerial() {
+        log("Begin to gather the classes information in serial.")
         dirInputs.forEach(infoFromDirInput)
         val jarInputNames = jarInputs.keys
         sdkEditorConfig.fixedJarNamesSet()?.mapNotNull {
             findInfoJarInput(it, jarInputNames)
         }?.forEach(infoFromJarInput)
-        log("The classes information collection:$replaceClasses")
+    }
+
+    private fun gatherInfoParallel() = runBlocking {
+        log("Begin to gather the classes information in parallel.")
+        for (dirInput in dirInputs) {
+            launch {
+                infoFromDirInput(dirInput)
+            }
+        }
+        val jarInputNames = jarInputs.keys
+        sdkEditorConfig.fixedJarNamesSet()?.mapNotNull {
+            findInfoJarInput(it, jarInputNames)
+        }?.forEach {
+            launch { infoFromJarInput(it) }
+        }
     }
 
     /**

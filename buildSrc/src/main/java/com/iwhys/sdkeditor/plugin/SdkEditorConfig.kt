@@ -11,6 +11,11 @@ import org.gradle.api.Project
 open class SdkEditorConfig {
 
     /**
+     * 是否开启并行处理任务，false单线程处理，true使用协程多线程处理任务
+     */
+    var parallel: Boolean = false
+
+    /**
      * 收集信息时需要被额外检查的jar的名称，即包括Fix类的jar包
      */
     @Deprecated(message = "Use fixedJarNames instead", replaceWith = ReplaceWith("fixedJarNames"))
