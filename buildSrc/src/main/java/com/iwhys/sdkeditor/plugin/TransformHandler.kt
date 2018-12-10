@@ -220,8 +220,8 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         val jarFileTmpDir = JarUtil.getJarFileTmpDir(dest)
         val jarFile = JarFile(this.file)
         jarFile.stream().forEach {
-            val inputStream = jarFile.getInputStream(it)
             if (it.name.endsWith(SdkConstants.DOT_CLASS)) {
+                val inputStream = jarFile.getInputStream(it)
                 safe {
                     classPool.makeClass(inputStream)?.apply {
                         val needOutput = block()
@@ -234,9 +234,15 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                     }
                 }
             } else {
-                log("Output the file not end with 'class' in the target jar package:${it.name}")
                 val outFile = File(jarFileTmpDir, it.name)
-                FileUtils.write(outFile, inputStream.reader().readText())
+                if (it.isDirectory && !outFile.exists()) {
+                    log("The file is directory ${it.name} in the target jar package:${jarFile.name}")
+                    outFile.mkdirs()
+                } else {
+                    log("The file not end with 'class' in the target jar package:${jarFile.name}")
+                    val inputStream = jarFile.getInputStream(it)
+                    FileUtils.write(outFile, inputStream.reader().readText())
+                }
             }
         }
         val tmpDirFile = File(jarFileTmpDir)
