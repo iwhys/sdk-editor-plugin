@@ -43,7 +43,7 @@ class SdkEditorPlugin : Transform(), Plugin<Project> {
         val start = System.currentTimeMillis()
         log("begin to transform")
         TransformHandler(project, transformInvocation).handle()
-        log("finish transform, total time:${(System.currentTimeMillis() - start) / 1000} seconds")
+        log("finish transform, total time:${(System.currentTimeMillis() - start)} ms")
     }
 
     companion object {

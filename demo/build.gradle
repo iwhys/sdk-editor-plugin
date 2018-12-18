@@ -26,7 +26,7 @@ android {
 
 sdkEditor {
     fixedJarNames = ['hack_du']
-    parallel = false
+    parallel true
 }
 
 repositories {

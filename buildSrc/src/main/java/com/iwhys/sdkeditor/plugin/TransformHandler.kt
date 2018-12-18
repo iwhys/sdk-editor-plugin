@@ -4,15 +4,16 @@ import com.android.SdkConstants
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInvocation
+import com.android.ide.common.internal.WaitableExecutor
 import com.iwhys.classeditor.domain.ReplaceClass
 import javassist.ClassPool
 import javassist.CtClass
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import java.io.File
 import java.util.jar.JarFile
+
+
 
 /**
  * Created on 2018/11/8 14:22
@@ -91,21 +92,23 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         }
     }
 
-    private fun fixSdkParallel() = runBlocking {
+    private fun fixSdkParallel() {
         log("Begin to fix the bug classes in parallel.")
+        val waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool()
         for (jarInput in jarInputs.values) {
             if (!isTargetJar(jarInput.name)) {
                 log("Not the target jar package, output directly:${jarInput.name}")
-                launch {
+                waitableExecutor.execute {
                     safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
                 }
                 continue
             }
             log("Found the target jar package：${jarInput.name}, prepare to fix.")
-            launch {
+            waitableExecutor.execute {
                 jarInput.handleClass { name !in replaceClasses }
             }
         }
+        waitableExecutor.waitForTasksWithQuickFail<Unit>(true)
     }
 
     /**
@@ -150,10 +153,11 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         }?.forEach(infoFromJarInput)
     }
 
-    private fun gatherInfoParallel() = runBlocking {
+    private fun gatherInfoParallel() {
+        val waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool()
         log("Begin to gather the classes information in parallel.")
         for (dirInput in dirInputs) {
-            launch {
+            waitableExecutor.execute {
                 infoFromDirInput(dirInput)
             }
         }
@@ -161,8 +165,9 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         sdkEditorConfig.fixedJarNamesSet()?.mapNotNull {
             findInfoJarInput(it, jarInputNames)
         }?.forEach {
-            launch { infoFromJarInput(it) }
+            waitableExecutor.execute { infoFromJarInput(it) }
         }
+        waitableExecutor.waitForTasksWithQuickFail<Unit>(true)
     }
 
     /**
