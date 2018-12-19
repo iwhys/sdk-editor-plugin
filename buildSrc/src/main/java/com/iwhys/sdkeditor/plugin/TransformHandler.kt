@@ -3,6 +3,7 @@ package com.iwhys.sdkeditor.plugin
 import com.android.SdkConstants
 import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.JarInput
+import com.android.build.api.transform.Status
 import com.android.build.api.transform.TransformInvocation
 import com.android.ide.common.internal.WaitableExecutor
 import com.iwhys.classeditor.domain.ReplaceClass
@@ -12,7 +13,6 @@ import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import java.io.File
 import java.util.jar.JarFile
-
 
 
 /**
@@ -48,8 +48,16 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      */
     private val replaceClasses = mutableSetOf<String>()
 
+    /**
+     * 是否增量编译
+     */
+    private val isIncremental = transformInvocation.isIncremental
+
     init {
-        outputProvider.deleteAll()
+        log("isIncrementalMode = $isIncremental")
+        if (!isIncremental) {
+            outputProvider.deleteAll()
+        }
         transformInvocation.inputs.forEach {
             dirInputs += it.directoryInputs
             for (jarInput in it.jarInputs) {
@@ -82,13 +90,18 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
     private fun fixSdkSerial() {
         log("Begin to fix the bug classes in serial.")
         for (jarInput in jarInputs.values) {
-            if (!isTargetJar(jarInput.name)) {
-                log("Not the target jar package, output directly:${jarInput.name}")
-                safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
-                continue
+            val dest = outputProvider.jarOutput(jarInput)
+            if (!isIncremental || (jarInput.status == Status.ADDED || jarInput.status == Status.CHANGED)) {
+                if (!isTargetJar(jarInput.name)) {
+                    log("Not the target jar package, output directly:${jarInput.name}")
+                    safe { FileUtils.copyFile(jarInput.file, dest) }
+                } else {
+                    log("Found the target jar package：${jarInput.name}, prepare to fix.")
+                    jarInput.handleClass { name !in replaceClasses }
+                }
+            } else if (isIncremental && jarInput.status == Status.REMOVED) {
+                dest.delete()
             }
-            log("Found the target jar package：${jarInput.name}, prepare to fix.")
-            jarInput.handleClass { name !in replaceClasses }
         }
     }
 
@@ -96,16 +109,21 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         log("Begin to fix the bug classes in parallel.")
         val waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool()
         for (jarInput in jarInputs.values) {
-            if (!isTargetJar(jarInput.name)) {
-                log("Not the target jar package, output directly:${jarInput.name}")
-                waitableExecutor.execute {
-                    safe { FileUtils.copyFile(jarInput.file, outputProvider.jarOutput(jarInput)) }
+            val dest = outputProvider.jarOutput(jarInput)
+            if (!isIncremental || (jarInput.status == Status.ADDED || jarInput.status == Status.CHANGED)) {
+                if (!isTargetJar(jarInput.name)) {
+                    log("Not the target jar package, output directly:${jarInput.name}")
+                    waitableExecutor.execute {
+                        safe { FileUtils.copyFile(jarInput.file, dest) }
+                    }
+                } else {
+                    log("Found the target jar package：${jarInput.name}, prepare to fix.")
+                    waitableExecutor.execute {
+                        jarInput.handleClass { name !in replaceClasses }
+                    }
                 }
-                continue
-            }
-            log("Found the target jar package：${jarInput.name}, prepare to fix.")
-            waitableExecutor.execute {
-                jarInput.handleClass { name !in replaceClasses }
+            } else if (isIncremental && jarInput.status == Status.REMOVED) {
+                dest.delete()
             }
         }
         waitableExecutor.waitForTasksWithQuickFail<Unit>(true)
@@ -188,19 +206,32 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
     private val infoFromDirInput = { dirInput: DirectoryInput ->
         classPool.addPathDirInput(dirInput)
         val dest = outputProvider.dirOutput(dirInput)
-        FileUtils.listFiles(dirInput.file, null, true).forEach {
-            if (it.extension == SdkConstants.EXT_CLASS) {
+        val handleFile: (File) -> Unit = { file: File ->
+            if (file.extension == SdkConstants.EXT_CLASS) {
                 safe {
-                    classPool.makeClass(it.inputStream())?.apply {
+                    classPool.makeClass(file.inputStream())?.apply {
                         gatherInfo()
                         writeFile(dest.absolutePath)
                         detach()
                     }
                 }
             } else {
-                log("The file's extension is not class, output directly:${it.name}")
-                it.copyToDir(dest)
+                log("The file's extension is not class, output directly:${file.name}")
+                file.copyToDir(dest)
             }
+        }
+        if (isIncremental) {
+            dirInput.changedFiles.forEach { file, status ->
+                val relativeFile = file.relativeTo(dirInput.file)
+                val outputFile = dest.resolve(relativeFile)
+                when (status) {
+                    Status.ADDED, Status.CHANGED -> handleFile(file)
+                    Status.REMOVED -> outputFile.delete()
+                    else -> { }
+                }
+            }
+        } else {
+            FileUtils.listFiles(dirInput.file, null, true).forEach(handleFile)
         }
     }
 

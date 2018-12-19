@@ -26,7 +26,7 @@ def projectDescription = "The plugin to edit sdk."
 
 group = "com.iwhys.sdkeditor"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.1.4"
+version = "1.1.5"
 
 //生成源文件
 task sourcesJar(type: Jar, dependsOn: classes) {

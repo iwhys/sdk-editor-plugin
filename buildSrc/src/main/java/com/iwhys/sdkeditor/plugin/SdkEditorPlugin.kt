@@ -24,7 +24,7 @@ class SdkEditorPlugin : Transform(), Plugin<Project> {
         return TransformManager.CONTENT_CLASS
     }
 
-    override fun isIncremental() = false
+    override fun isIncremental() = true
 
     override fun getScopes(): MutableSet<in QualifiedContent.Scope> {
         return if (project.isApp) TransformManager.SCOPE_FULL_PROJECT else ImmutableSet.of(QualifiedContent.Scope.PROJECT)
