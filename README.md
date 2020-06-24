@@ -37,7 +37,7 @@ apply plugin: 'sdk-editor'
 @ReplaceClass("androidx.core:core:1.1.0")
 public class BuildCompat {
     public static boolean isAtLeastQ() {
-        Toast.makeText(MyAppKt.getAppContext(), "You have invoked the modified method: BuildCompat#isAtLeastQ()", Toast.LENGTH_LONG).show();
+        Toast.makeText(MyAppKt.getAppContext(), "You successfully added a Toast to \"BuildCompat#isAtLeastQ()\"", Toast.LENGTH_LONG).show();
         return VERSION.CODENAME.length() == 1
             && VERSION.CODENAME.charAt(0) >= 'Q'
             && VERSION.CODENAME.charAt(0) <= 'Z';
