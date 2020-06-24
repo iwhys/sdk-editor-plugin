@@ -1,6 +1,10 @@
 ## 简介
-sdk-editor是为实现修改APP依赖的第三方SDK而开发的Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对三方SDK中特定类的替换修改，100%可靠，不影响APP运行性能，也不会增加APK体积。
+sdk-editor是为实现修改APP依赖的第三方SDK而开发的Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对三方SDK中特定类的替换修改。
 <b><font color=blue>如果项目中某个必须的SDK没有源码、无人维护，还出现了Bug或者需要扩展功能，那么sdk-editor就是你的菜！</font></b>
+## 特点
+- 使用简单方便，不需要任何字节码知识；
+
+- 编译期替换，100%可靠，不影响App性能，不增加Apk体积；
 ## 适用场景
 - 修复SDK中存在的Bug；
 
