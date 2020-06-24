@@ -1,5 +1,6 @@
 ## 简介
-sdk-editor是为实现修改APP依赖的第三方SDK而开发的Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对三方SDK中特定类的替换修改，不影响APP运行性能，也不会增加APK体积。
+sdk-editor是为实现修改APP依赖的第三方SDK而开发的Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对三方SDK中特定类的替换修改，100%可靠，不影响APP运行性能，也不会增加APK体积。
+<b><font color=blue>如果项目中某个必须的SDK没有源码、无人维护，还出现了Bug或者需要扩展功能，那么sdk-editor就是你的菜！</font></b>
 ## 适用场景
 - 修复SDK中存在的Bug；
 
@@ -29,13 +30,13 @@ apply plugin: 'sdk-editor'
 
 2）拷贝原SDK中BuildCompat类的内容，并修改新建的BuildCompat类；
 ```java
-@ReplaceClass("com.android.support:support-compat:28.0.0")
+@ReplaceClass("androidx.core:core:1.1.0")
 public class BuildCompat {
-    ...
     public static boolean isAtLeastQ() {
-        // 注意：这里增加了我们自定义的代码
-        Toast.makeText(MyAppKt.getAppContext(), "you have invoked the method: BuildCompat#isAtLeastQ()", Toast.LENGTH_LONG).show();
-        return VERSION.CODENAME.length() == 1 && VERSION.CODENAME.charAt(0) >= 'Q' && VERSION.CODENAME.charAt(0) <= 'Z';
+        Toast.makeText(MyAppKt.getAppContext(), "You have invoked the modified method: BuildCompat#isAtLeastQ()", Toast.LENGTH_LONG).show();
+        return VERSION.CODENAME.length() == 1
+            && VERSION.CODENAME.charAt(0) >= 'Q'
+            && VERSION.CODENAME.charAt(0) <= 'Z';
     }
 }
 ```

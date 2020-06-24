@@ -61,6 +61,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         transformInvocation.inputs.forEach {
             dirInputs += it.directoryInputs
             for (jarInput in it.jarInputs) {
+                classPool.addPathJarInput(jarInput)
                 jarInputs[jarInput.name] = jarInput
             }
         }
@@ -227,7 +228,8 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                 when (status) {
                     Status.ADDED, Status.CHANGED -> handleFile(file)
                     Status.REMOVED -> outputFile.delete()
-                    else -> { }
+                    else -> {
+                    }
                 }
             }
         } else {
@@ -252,7 +254,6 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      */
     private fun JarInput.handleClass(block: CtClass.() -> Boolean) {
         val dest = outputProvider.jarOutput(this)
-        classPool.addPathJarInput(this)
         val jarFileTmpDir = JarUtil.getJarFileTmpDir(dest)
         val jarFile = JarFile(this.file)
         jarFile.stream().forEach {
@@ -299,6 +300,9 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                 log("Note:the annotation in the Fix class is missing the value of the jar package name:$name")
             }
             handleReplaceClass(jarName)
+        } else if (superclass?.name == "android.app.Application") {
+            val targetMethod = safe { getDeclaredMethod("onCreate") } ?: safe { getDeclaredMethod("attachBaseContext") }
+            targetMethod?.insertAfter("{ System.out.println(\"*************\" + $0);}")
         }
     }
 

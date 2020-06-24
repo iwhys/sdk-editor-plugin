@@ -1,9 +1,9 @@
 package com.iwhys.sdkeditor.demo
 
 import android.os.Bundle
-import android.support.v4.os.BuildCompat
-import android.support.v7.app.AppCompatActivity
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.BuildCompat
 
 /**
  * Created on 2018/11/8 15:15
