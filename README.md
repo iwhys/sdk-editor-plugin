@@ -1,6 +1,7 @@
 ## 更新日志
-- 支持Android Gradle插件4.2
+- 支持Android Gradle插件4.2.x
 - 原有@ReplaceClass("包标识")，中的[包标识]改为依赖格式[group:name:version]只取<b>[name:version]</b>作为标识，如：原依赖[androidx.core:core:1.3.0] 只取[core:1.3.0]作为标识
+- 发布仓库由jcenter迁移到[jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
 
 ## 简介
 - **sdk-editor是一个在APP编译器修改类的轻量Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对特定类的替换修改。**
@@ -22,8 +23,12 @@
 #### 1. 在根项目（最外层）的build.gradle文件中添加插件依赖：
 ```gradle
 buildscript {
+    repositories {
+			...
+			maven { url 'https://jitpack.io' }
+	}
     dependencies {
-        classpath 'com.iwhys.sdkeditor:plugin:1.1.5'
+        classpath 'com.github.iwhys:sdk-editor-plugin:1.1.6'
     }
 }
 ```
