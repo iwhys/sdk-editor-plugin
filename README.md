@@ -1,3 +1,7 @@
+## 更新日志
+- 支持Android Gradle插件4.2
+- 原有@ReplaceClass("包标识")，中的[包标识]改为依赖格式[group:name:version]只取<b>[name:version]</b>作为标识
+
 ## 简介
 - **sdk-editor是一个在APP编译器修改类的轻量Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对特定类的替换修改。**
 
@@ -19,7 +23,7 @@
 ```gradle
 buildscript {
     dependencies {
-        classpath 'com.iwhys.sdkeditor:plugin:1.1.4'
+        classpath 'com.iwhys.sdkeditor:plugin:1.1.5'
     }
 }
 ```
@@ -27,25 +31,26 @@ buildscript {
 ```gradle
 apply plugin: 'sdk-editor'
 ```
-#### 3. 找到三方SDK中需要修改的类文件（以下称为Bug类），在app module中新建与Bug类同包名同类名的新类（以下称为Fix类），同时拷贝Bug类的内容到Fix类，给Fix类添加类注解@ReplaceClass，在注解的值中标记该类所在SDK的名字，最后在Fix类中实现要修改的内容即可。
+#### 3. 找到三方SDK中需要修改的类文件（以下称为Bug类），在app module中新建与Bug类同包名同类名的新类（以下称为Fix类），同时拷贝Bug类的内容到Fix类，给Fix类添加类注解@ReplaceClass，在注解的值中标记该类所在SDK(jar/aar)的标识(依赖格式[group:name:version]只取<b>[name:version]</b>作为标识)，最后在Fix类中实现要修改的内容即可。
 
-下面以demo module中替换support v4包中的BuildCompat类为例进行说明，我们需要BuildCompat类中的isAtLeastQ方法，在其中添加一条Toast语句，修改流程如下：
+下面以demo module中替换core:1.3.0包中的BuildCompat类为例进行说明，我们需要BuildCompat类中的isAtLeastR方法，在其中添加一条Toast语句，修改流程如下：
 
-1）在demo工程的main/java下新建android/support/v4/os/BuildCompat类；
+1）在demo工程的main/java下新建androidx.core.os.BuildCompat类；
 
 2）拷贝原SDK中BuildCompat类的内容，并修改新建的BuildCompat类；
 ```java
-@ReplaceClass("androidx.core:core:1.1.0")
+// 原依赖[androidx.core:core:1.3.0] 只取[core:1.3.0]作为标识
+@ReplaceClass("core:1.3.0")
 public class BuildCompat {
-    public static boolean isAtLeastQ() {
+    public static boolean isAtLeastR() {
         Toast.makeText(MyAppKt.getAppContext(), "You successfully added a Toast to \"BuildCompat#isAtLeastQ()\"", Toast.LENGTH_LONG).show();
         return VERSION.CODENAME.length() == 1
-            && VERSION.CODENAME.charAt(0) >= 'Q'
-            && VERSION.CODENAME.charAt(0) <= 'Z';
+                        && VERSION.CODENAME.charAt(0) >= 'R'
+                        && VERSION.CODENAME.charAt(0) <= 'Z';
     }
 }
 ```
-3）编译并运行demo，点击按钮弹出一个Toast，即表明support v4包中的BuildCompat类被成功的修改；
+3）编译并运行demo，点击按钮弹出一个Toast，即表明core:1.3.0包中的BuildCompat类被成功的修改；
 ## 高级用法
 如果有多个项目用到了同一个需要修改的SDK，为了在多个项目中共享修复后的代码，我们可以把修复代码封装成一个单独jar/aar包。下面以demo模块中libs引用的三方SDK DuappsAd-HW-v1.1.1.6-release.aar为例，我们需要修改SDK中的com.duapps.ad.DuNativeAd类，在其中添加广告请求监听器，具体流程如下：
 

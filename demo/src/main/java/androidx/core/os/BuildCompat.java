@@ -28,7 +28,7 @@ import com.iwhys.sdkeditor.demo.MyAppKt;
  * 这是我们要修复的类
  * 在[BuildCompat.isAtLeastQ]方法中添加一个Toast
  */
-@ReplaceClass("androidx.core:core:1.1.0")
+@ReplaceClass("core-1.3.0")
 public class BuildCompat {
     private BuildCompat() {
     }
@@ -101,17 +101,29 @@ public class BuildCompat {
     /**
      * Checks if the device is running on a pre-release version of Android Q or newer.
      * <p>
-     * <strong>Note:</strong> This method will return {@code false} on devices running release
-     * versions of Android. When Android Q is finalized for release, this method will be deprecated
-     * and all calls should be replaced with {@code Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q}.
-     *
      * @return {@code true} if Q APIs are available for use, {@code false} otherwise
+     * @deprecated Android Q is a finalized release and this method is no longer necessary. It
+     *             will be removed in a future release of the Support Library. Instead, use
+     *             {@code Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q}.
      */
-    // TODO Inline usages, update ObsoleteBuildCompatUsageDetector, and deprecate once Q is final.
+    @Deprecated
     public static boolean isAtLeastQ() {
-        Toast.makeText(MyAppKt.getAppContext(), "You successfully added a Toast to \"BuildCompat#isAtLeastQ()\"", Toast.LENGTH_LONG).show();
+        return VERSION.SDK_INT >= 29;
+    }
+
+    /**
+     * Checks if the device is running on a pre-release version of Android R or newer.
+     * <p>
+     * <strong>Note:</strong> This method will return {@code false} on devices running release
+     * versions of Android. When Android R is finalized for release, this method will be deprecated
+     * and all calls should be replaced with {@code Build.VERSION.SDK_INT >= Build.VERSION_CODES.R}.
+     *
+     * @return {@code true} if R APIs are available for use, {@code false} otherwise
+     */
+    public static boolean isAtLeastR() {
+        Toast.makeText(MyAppKt.getAppContext(), "You successfully added a Toast to \"BuildCompat#isAtLeastR()\"", Toast.LENGTH_LONG).show();
         return VERSION.CODENAME.length() == 1
-            && VERSION.CODENAME.charAt(0) >= 'Q'
-            && VERSION.CODENAME.charAt(0) <= 'Z';
+                && VERSION.CODENAME.charAt(0) >= 'R'
+                && VERSION.CODENAME.charAt(0) <= 'Z';
     }
 }

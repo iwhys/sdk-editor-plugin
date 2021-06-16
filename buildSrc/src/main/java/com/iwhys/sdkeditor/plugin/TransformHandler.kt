@@ -62,7 +62,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
             dirInputs += it.directoryInputs
             for (jarInput in it.jarInputs) {
                 classPool.addPathJarInput(jarInput)
-                jarInputs[jarInput.name] = jarInput
+                jarInputs[jarInput.file.nameWithoutExtension] = jarInput
             }
         }
     }
@@ -93,11 +93,13 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         for (jarInput in jarInputs.values) {
             val dest = outputProvider.jarOutput(jarInput)
             if (!isIncremental || (jarInput.status == Status.ADDED || jarInput.status == Status.CHANGED)) {
-                if (!isTargetJar(jarInput.name)) {
-                    log("Not the target jar package, output directly:${jarInput.name}")
-                    safe { FileUtils.copyFile(jarInput.file, dest) }
+                val jarFile = jarInput.file
+                val jarName = jarFile.name
+                if (!isTargetJar(jarName)) {
+                    log("Not the target jar package, output directly:${jarName}")
+                    safe { FileUtils.copyFile(jarFile, dest) }
                 } else {
-                    log("Found the target jar package：${jarInput.name}, prepare to fix.")
+                    log("Found the target jar package：${jarName}, prepare to fix.")
                     jarInput.handleClass { name !in replaceClasses }
                 }
             } else if (isIncremental && jarInput.status == Status.REMOVED) {
@@ -112,13 +114,15 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
         for (jarInput in jarInputs.values) {
             val dest = outputProvider.jarOutput(jarInput)
             if (!isIncremental || (jarInput.status == Status.ADDED || jarInput.status == Status.CHANGED)) {
-                if (!isTargetJar(jarInput.name)) {
-                    log("Not the target jar package, output directly:${jarInput.name}")
+                val jarFile = jarInput.file
+                val jarName = jarFile.name
+                if (!isTargetJar(jarName)) {
+                    log("Not the target jar package, output directly:${jarName}")
                     waitableExecutor.execute {
-                        safe { FileUtils.copyFile(jarInput.file, dest) }
+                        safe { FileUtils.copyFile(jarFile, dest) }
                     }
                 } else {
-                    log("Found the target jar package：${jarInput.name}, prepare to fix.")
+                    log("Found the target jar package：${jarName}, prepare to fix.")
                     waitableExecutor.execute {
                         jarInput.handleClass { name !in replaceClasses }
                     }
