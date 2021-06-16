@@ -1,7 +1,7 @@
 [![](https://jitpack.io/v/iwhys/sdk-editor-plugin.svg)](https://jitpack.io/#iwhys/sdk-editor-plugin)
 ## 更新日志
 - 支持Android Gradle插件4.2.x
-- 原有@ReplaceClass("包标识")，中的[包标识]改为依赖格式[group:name:version]只取<b>[name:version]</b>作为标识，如：原依赖[androidx.core:core:1.3.0] 只取[core:1.3.0]作为标识
+- 原有@ReplaceClass("包标识")，中的"包标识"改为依赖库格式[group:name:version]取<b>[name:version]</b>作为标识，如：原依赖[androidx.core:core:1.3.0] 取[core:1.3.0]作为标识
 - 发布仓库由jcenter迁移到[jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
 
 ## 简介
@@ -25,8 +25,8 @@
 ```gradle
 buildscript {
     repositories {
-			...
-			maven { url 'https://jitpack.io' }
+		...
+		maven { url 'https://jitpack.io' }
 	}
     dependencies {
         classpath 'com.github.iwhys:sdk-editor-plugin:1.1.6'
@@ -45,7 +45,7 @@ apply plugin: 'sdk-editor'
 
 2）拷贝原SDK中BuildCompat类的内容，并修改新建的BuildCompat类；
 ```java
-// 原依赖[androidx.core:core:1.3.0] 只取[core:1.3.0]作为标识
+/** 原依赖[androidx.core:core:1.3.0] 取[core:1.3.0]作为标识 **/
 @ReplaceClass("core:1.3.0")
 public class BuildCompat {
     public static boolean isAtLeastR() {
