@@ -1,3 +1,4 @@
+[![](https://jitpack.io/v/iwhys/sdk-editor-plugin.svg)](https://jitpack.io/#iwhys/sdk-editor-plugin)
 ## 更新日志
 - 支持Android Gradle插件4.2.x
 - 原有@ReplaceClass("包标识")，中的[包标识]改为依赖格式[group:name:version]只取<b>[name:version]</b>作为标识，如：原依赖[androidx.core:core:1.3.0] 只取[core:1.3.0]作为标识
