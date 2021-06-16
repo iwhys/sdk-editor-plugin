@@ -1,5 +1,5 @@
 [![](https://jitpack.io/v/iwhys/sdk-editor-plugin.svg)](https://jitpack.io/#iwhys/sdk-editor-plugin)
-## 更新日志
+## 更新说明
 - 支持Android Gradle插件4.2.x
 - 原有@ReplaceClass("包标识")，中的"包标识"改为依赖库格式[group:name:version]取<b>[name:version]</b>作为标识，如：原依赖[androidx.core:core:1.3.0] 取[core:1.3.0]作为标识
 - 发布仓库由jcenter迁移到[jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
@@ -25,9 +25,9 @@
 ```gradle
 buildscript {
     repositories {
-		...
-		maven { url 'https://jitpack.io' }
-	}
+	...
+	maven { url 'https://jitpack.io' }
+    }
     dependencies {
         classpath 'com.github.iwhys:sdk-editor-plugin:1.1.6'
     }
