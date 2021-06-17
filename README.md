@@ -29,7 +29,7 @@ buildscript {
 	maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath 'com.github.iwhys:sdk-editor-plugin:1.1.6'
+        classpath 'com.github.iwhys:sdk-editor-plugin:1.1.7'
     }
 }
 ```
