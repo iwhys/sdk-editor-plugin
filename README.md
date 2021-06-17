@@ -1,8 +1,8 @@
 [![](https://jitpack.io/v/iwhys/sdk-editor-plugin.svg)](https://jitpack.io/#iwhys/sdk-editor-plugin)
 ## 更新说明
 - 支持Android Gradle Plugin 4.2.x
-- 原有@ReplaceClass("包标识")，中的"包标识"改为把依赖库格式[group:name:version]中的<span style="font-color:red; font-weight:800;">[name:version]</span>作为标识，如：原依赖[androidx.core:core:1.3.0]，则取[core:1.3.0]作为标识
-- 发布仓库由jcenter迁移到[jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
+- 原有@ReplaceClass("包标识")，中的"包标识"改为把依赖库格式**[group:name:version]**中的**[name:version]**作为标识，如：原依赖[androidx.core:core:1.3.0]，则取[core:1.3.0]作为标识
+- 发布仓库由jcenter迁移到 [jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
 
 ## 简介
 - **sdk-editor是一个在APP编译期修改类的轻量Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对特定类的替换修改。无其他不安全Hook操作，100%可靠。**
