@@ -1,17 +1,17 @@
 [![](https://jitpack.io/v/iwhys/sdk-editor-plugin.svg)](https://jitpack.io/#iwhys/sdk-editor-plugin)
 ## 更新说明
-- 支持Android Gradle插件4.2.x
+- 支持Android Gradle Plugin 4.2.x
 - 原有@ReplaceClass("包标识")，中的"包标识"改为依赖库格式[group:name:version]取<font color="red"><b>[name:version]</b></font>作为标识，如：原依赖[androidx.core:core:1.3.0] 取[core:1.3.0]作为标识
 - 发布仓库由jcenter迁移到[jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
 
 ## 简介
-- **sdk-editor是一个在APP编译器修改类的轻量Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对特定类的替换修改。**
+- **sdk-editor是一个在APP编译期修改类的轻量Gradle插件，插件利用Android Plugin官方提供的Transform API干预APK Build流程，实现对特定类的替换修改。无其他不安全Hook操作，100%可靠。**
 
 - **如果APP中某个依赖的SDK没有源码、无人迭代，并且发现Bug或者需要扩展功能，那么sdk-editor就是你的菜！**
 ## 特点
 - 使用简单方便，不需要任何字节码知识；
 
-- 编译期替换，100%可靠，不影响App性能，不增加Apk体积；
+- 编译期替换，不影响App性能，不增加Apk体积(仅添加一个用于标记的注解类ReplaceClass)；
 ## 适用场景
 - 修复SDK中存在的Bug；
 
