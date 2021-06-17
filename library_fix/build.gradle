@@ -1,8 +1,5 @@
-import com.iwhys.sdkeditor.plugin.SdkEditorPlugin
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: SdkEditorPlugin
 
 android {
     compileSdkVersion 30
@@ -72,4 +69,5 @@ dependencies {
     implementation('com.facebook.android:audience-network-sdk:4.23.0') {
         exclude group: 'com.android.support'
     }
+    implementation "com.github.iwhys:sdk-editor-domain:1.2.0"
 }

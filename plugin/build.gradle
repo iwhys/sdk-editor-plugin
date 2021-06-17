@@ -21,7 +21,6 @@ buildscript {
         jcenter()
     }
     dependencies {
-        //这里我写的时候是这个版本
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }

@@ -7,6 +7,7 @@ import com.android.build.api.transform.Status
 import com.android.build.api.transform.TransformInvocation
 import com.android.ide.common.workers.ExecutorServiceAdapter
 import com.android.ide.common.workers.WorkerExecutorFacade
+import com.iwhys.sdkeditor.domain.ReplaceClass
 import javassist.ClassPool
 import javassist.CtClass
 import org.apache.commons.io.FileUtils
