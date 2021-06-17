@@ -1,1 +1,1 @@
-include ':demo', ':library_fix', ':plugin'
+include ':demo', ':library_fix', ':plugin', ':domain'

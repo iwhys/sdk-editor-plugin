@@ -5,13 +5,13 @@ import com.android.build.api.transform.DirectoryInput
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.Status
 import com.android.build.api.transform.TransformInvocation
-import com.android.ide.common.internal.WaitableExecutor
-import com.iwhys.classeditor.domain.ReplaceClass
+import com.android.ide.common.workers.ExecutorServiceAdapter
+import com.android.ide.common.workers.WorkerExecutorFacade
 import javassist.ClassPool
 import javassist.CtClass
 import org.apache.commons.io.FileUtils
-import org.gradle.api.Project
 import java.io.File
+import java.util.concurrent.ForkJoinPool
 import java.util.jar.JarFile
 
 
@@ -21,14 +21,11 @@ import java.util.jar.JarFile
  *
  * @author 王洪胜
  */
-class TransformHandler(project: Project, transformInvocation: TransformInvocation) {
-
-    private val classPool = ClassPool(true).apply {
-        addPathProject(project)
-        importPackage(ReplaceClass::class.java.`package`.name)
-    }
-
-    private val sdkEditorConfig = SdkEditorConfig[project]
+class TransformHandler(
+    private val classPool: ClassPool,
+    private val sdkEditorConfig: SdkEditorConfig,
+    transformInvocation: TransformInvocation
+) {
 
     private val isParallel = sdkEditorConfig.parallel
 
@@ -110,7 +107,7 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
 
     private fun fixSdkParallel() {
         log("Begin to fix the bug classes in parallel.")
-        val waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool()
+        val executor = ExecutorServiceAdapter(ForkJoinPool.commonPool())
         for (jarInput in jarInputs.values) {
             val dest = outputProvider.jarOutput(jarInput)
             if (!isIncremental || (jarInput.status == Status.ADDED || jarInput.status == Status.CHANGED)) {
@@ -118,20 +115,27 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                 val jarName = jarFile.name
                 if (!isTargetJar(jarName)) {
                     log("Not the target jar package, output directly:${jarName}")
-                    waitableExecutor.execute {
-                        safe { FileUtils.copyFile(jarFile, dest) }
-                    }
+                    executor.submit(object : WorkerExecutorFacade.WorkAction {
+                        override fun run() {
+                            safe { FileUtils.copyFile(jarFile, dest) }
+                        }
+                    })
                 } else {
                     log("Found the target jar package：${jarName}, prepare to fix.")
-                    waitableExecutor.execute {
-                        jarInput.handleClass { name !in replaceClasses }
-                    }
+                    executor.submit(object : WorkerExecutorFacade.WorkAction {
+                        override fun run() {
+                            jarInput.handleClass { name !in replaceClasses }
+                        }
+                    })
                 }
             } else if (isIncremental && jarInput.status == Status.REMOVED) {
                 dest.delete()
             }
         }
-        waitableExecutor.waitForTasksWithQuickFail<Unit>(true)
+        safe {
+            executor.await()
+            executor.close()
+        }
     }
 
     /**
@@ -177,20 +181,29 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
     }
 
     private fun gatherInfoParallel() {
-        val waitableExecutor = WaitableExecutor.useGlobalSharedThreadPool()
+        val executor = ExecutorServiceAdapter(ForkJoinPool.commonPool())
         log("Begin to gather the classes information in parallel.")
         for (dirInput in dirInputs) {
-            waitableExecutor.execute {
-                infoFromDirInput(dirInput)
-            }
+            executor.submit(object : WorkerExecutorFacade.WorkAction {
+                override fun run() {
+                    infoFromDirInput(dirInput)
+                }
+            })
         }
         val jarInputNames = jarInputs.keys
         sdkEditorConfig.fixedJarNamesSet()?.mapNotNull {
             findInfoJarInput(it, jarInputNames)
         }?.forEach {
-            waitableExecutor.execute { infoFromJarInput(it) }
+            executor.submit(object : WorkerExecutorFacade.WorkAction {
+                override fun run() {
+                    infoFromJarInput(it)
+                }
+            })
         }
-        waitableExecutor.waitForTasksWithQuickFail<Unit>(true)
+        safe {
+            executor.await()
+            executor.close()
+        }
     }
 
     /**
@@ -304,9 +317,6 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
                 log("Note:the annotation in the Fix class is missing the value of the jar package name:$name")
             }
             handleReplaceClass(jarName)
-        } else if (superclass?.name == "android.app.Application") {
-            val targetMethod = safe { getDeclaredMethod("onCreate") } ?: safe { getDeclaredMethod("attachBaseContext") }
-            targetMethod?.insertAfter("{ System.out.println(\"*************\" + $0);}")
         }
     }
 
@@ -314,13 +324,15 @@ class TransformHandler(project: Project, transformInvocation: TransformInvocatio
      * 处理替换类信息
      */
     private fun CtClass.handleReplaceClass(jarName: String) {
+        val finalJarName = jarName.replace(':', '-')
         // 递归处理内部类
         nestedClasses?.forEach {
-            it.handleReplaceClass(jarName)
+            it.handleReplaceClass(finalJarName)
         }
         targetJarNames += jarName
+        targetJarNames += finalJarName
         replaceClasses += name
-        log("Found the Fix class named:$name the jar package name:$jarName")
+        log("Found the Fix class named:$name the jar package name:$finalJarName")
     }
 
 }

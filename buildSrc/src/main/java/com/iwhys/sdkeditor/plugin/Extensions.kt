@@ -34,6 +34,7 @@ inline fun <R> safe(noinline error: (Exception.() -> Unit)? = null, block: () ->
             error(e)
         } else {
             log("错误:${e.localizedMessage}")
+            throw e
         }
     }
     return null

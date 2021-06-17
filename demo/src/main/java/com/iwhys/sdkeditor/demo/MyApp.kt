@@ -17,7 +17,6 @@ class MyApp : Application() {
         AppDelegate.application = this
         super.attachBaseContext(base)
     }
-
 }
 
 val appContext by AppDelegate

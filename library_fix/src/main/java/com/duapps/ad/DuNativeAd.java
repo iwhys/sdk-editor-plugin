@@ -12,7 +12,7 @@ import com.duapps.ad.base.LogHelper;
 import com.duapps.ad.base.k;
 import com.duapps.ad.base.n;
 import com.duapps.ad.entity.strategy.NativeAd;
-import com.iwhys.classeditor.domain.ReplaceClass;
+import com.iwhys.sdkeditor.plugin.ReplaceClass;
 
 import java.util.List;
 

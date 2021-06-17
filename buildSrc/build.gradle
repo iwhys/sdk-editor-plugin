@@ -24,5 +24,4 @@ dependencies {
     }
     implementation gradleApi()
     implementation 'org.javassist:javassist:3.24.0-GA'
-    implementation "com.iwhys.classeditor:domain:1.1.0"
 }

@@ -19,8 +19,8 @@ package androidx.core.os;
 import android.os.Build.VERSION;
 import android.widget.Toast;
 
-import com.iwhys.classeditor.domain.ReplaceClass;
 import com.iwhys.sdkeditor.demo.MyAppKt;
+import com.iwhys.sdkeditor.plugin.ReplaceClass;
 
 /**
  * This class contains additional platform version checking methods for targeting pre-release
@@ -28,7 +28,7 @@ import com.iwhys.sdkeditor.demo.MyAppKt;
  * 这是我们要修复的类
  * 在[BuildCompat.isAtLeastQ]方法中添加一个Toast
  */
-@ReplaceClass("core-1.3.0")
+@ReplaceClass("core:1.3.0")
 public class BuildCompat {
     private BuildCompat() {
     }
