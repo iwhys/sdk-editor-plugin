@@ -1,7 +1,7 @@
 [![](https://jitpack.io/v/iwhys/sdk-editor-plugin.svg)](https://jitpack.io/#iwhys/sdk-editor-plugin)
 ## 更新说明
 - 支持Android Gradle Plugin 4.2.x
-- 原有@ReplaceClass("包标识")，中的"包标识"改为把依赖库格式[**group:name:version**]中的[**name:version**]作为标识，如：原依赖[androidx.core:core:1.3.0]，则取[core:1.3.0]作为标识
+- 原有@ReplaceClass("包标识")，中的"包标识"改为把依赖库格式[**group:name:version**]中的[**name:version**]作为标识，如：原依赖[androidx.core:core:1.3.0@aar]，则取[core:1.3.0]作为标识，请不要添加[version]后面的@aar
 - 发布仓库由jcenter迁移到 [jitpack](https://jitpack.io/#iwhys/sdk-editor-plugin)
 
 ## 简介
